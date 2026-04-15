@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
+import { useNavigate } from "react-router-dom"
+
+
 
 export default function Feed({ session }) {
   const [posts, setPosts] = useState([])
@@ -9,6 +12,7 @@ export default function Feed({ session }) {
   const [description, setDescription] = useState("")
   const [file, setFile] = useState(null)
   const [showForm, setShowForm] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchPosts()
@@ -72,16 +76,22 @@ export default function Feed({ session }) {
         <h1 className="text-xl font-bold text-purple-600">ArtSync</h1>
         <div className="flex gap-4 items-center">
           <button
+            onClick={() => navigate("/dashboard")}
+            className="text-sm text-gray-500 hover:text-purple-600 transition"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate("/profile")}
+            className="text-sm text-gray-500 hover:text-purple-600 transition"
+          >
+            My Profile
+          </button>
+          <button
             onClick={() => setShowForm(!showForm)}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition"
           >
             + Upload
-          </button>
-          <button
-            onClick={() => supabase.auth.signOut()}
-            className="text-sm text-gray-400 hover:text-gray-600"
-          >
-            Sign out
           </button>
         </div>
       </nav>
@@ -127,7 +137,10 @@ export default function Feed({ session }) {
           <p className="text-gray-400 col-span-3 text-center">No posts yet. Be the first to upload!</p>
         ) : (
           posts.map(post => (
-            <div key={post.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            
+            <div key={post.id} 
+            className="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition"
+            onClick={() => navigate(`/artist/${post.profiles?.username}`)}>
               <img
                 src={post.image_url}
                 alt={post.title}

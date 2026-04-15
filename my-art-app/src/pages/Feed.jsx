@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 import { useNavigate } from "react-router-dom"
+import Navbar from "../components/Navbar"
 
 
 
@@ -72,29 +73,7 @@ export default function Feed({ session }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-purple-600">ArtSync</h1>
-        <div className="flex gap-4 items-center">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="text-sm text-gray-500 hover:text-purple-600 transition"
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => navigate("/profile")}
-            className="text-sm text-gray-500 hover:text-purple-600 transition"
-          >
-            My Profile
-          </button>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition"
-          >
-            + Upload
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       {showForm && (
         <div className="max-w-lg mx-auto mt-8 bg-white p-6 rounded-2xl shadow-md">

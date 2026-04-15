@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { supabase } from "../supabaseClient"
+import Navbar from "../components/Navbar"
 
 export default function ArtistProfile({ session }) {
   const { username } = useParams()
@@ -73,10 +74,7 @@ export default function ArtistProfile({ session }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm px-6 py-4">
-        <h1 className="text-xl font-bold text-purple-600">ArtSync</h1>
-      </nav>
-
+      <Navbar />
       <div className="max-w-4xl mx-auto mt-8 px-4">
         {/* Artist header */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 flex items-start justify-between">

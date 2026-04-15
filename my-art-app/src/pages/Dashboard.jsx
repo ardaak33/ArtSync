@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
+import Navbar from "../components/Navbar"
 
 export default function Dashboard({ session }) {
   const [commissions, setCommissions] = useState([])
@@ -37,10 +38,7 @@ export default function Dashboard({ session }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm px-6 py-4">
-        <h1 className="text-xl font-bold text-purple-600">ArtSync — Commission Dashboard</h1>
-      </nav>
-
+      <Navbar />
       <div className="max-w-3xl mx-auto mt-8 px-4 pb-12">
         {loading ? (
           <p className="text-gray-400 text-center">Loading...</p>

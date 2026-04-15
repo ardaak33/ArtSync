@@ -23,7 +23,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={!session ? <Auth /> : <Navigate to="/feed" />} />
+        <Route path="/" element={!session ? <Auth /> : <Navigate to="/profile" />} />
         <Route path="/feed" element={session ? <Feed session={session} /> : <Navigate to="/" />} />
         <Route path="/profile" element={session ? <Profile session={session} /> : <Navigate to="/" />} />
         <Route path="/artist/:username" element={session ? <ArtistProfile session={session} /> : <Navigate to="/" />} />

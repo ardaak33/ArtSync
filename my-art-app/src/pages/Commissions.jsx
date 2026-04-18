@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
+import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 
 export default function Commissions({ session }) {
   const [commissions, setCommissions] = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchCommissions()
@@ -49,7 +51,9 @@ export default function Commissions({ session }) {
             <div key={commission.id} className="bg-white rounded-2xl shadow-sm p-6 mb-4">
               <div className="flex justify-between items-start mb-3">
                 <p className="text-sm text-gray-400">
-                  From <span className="font-medium text-gray-700">@{commission.profiles?.username}</span>
+                  From <span className="font-medium text-purple-700 cursor-pointer hover:underline" onClick={() => navigate(`/artist/${commission.profiles?.username}`)}>
+                    @{commission.profiles?.username}
+                  </span>
                 </p>
                 <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColor[commission.status]}`}>
                   {commission.status}

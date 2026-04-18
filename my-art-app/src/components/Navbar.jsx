@@ -20,10 +20,10 @@ export default function Navbar() {
           Feed
         </button>
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/Commissions")}
           className="text-sm text-gray-500 hover:text-purple-600 transition"
         >
-          Dashboard
+          Commissions
         </button>
         <button
           onClick={() => navigate("/profile")}

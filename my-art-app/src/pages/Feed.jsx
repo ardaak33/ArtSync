@@ -119,7 +119,7 @@ export default function Feed({ session }) {
             
             <div key={post.id} 
             className="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition"
-            onClick={() => navigate(`/artist/${post.profiles?.username}`)}>
+            onClick={() => navigate(`/post/${post.id}`)}>
               <img
                 src={post.image_url}
                 alt={post.title}

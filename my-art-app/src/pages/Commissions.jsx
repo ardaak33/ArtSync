@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 import Navbar from "../components/Navbar"
 
-export default function Dashboard({ session }) {
+export default function Commissions({ session }) {
   const [commissions, setCommissions] = useState([])
   const [loading, setLoading] = useState(true)
 

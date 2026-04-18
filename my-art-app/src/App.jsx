@@ -5,7 +5,8 @@ import Auth from "./pages/Auth"
 import Profile from "./pages/Profile"
 import Feed from "./pages/Feed"
 import ArtistProfile from "./pages/ArtistProfile"
-import Dashboard from "./pages/Dashboard"
+import Commissions from "./pages/Commissions"
+import PostDetail from "./pages/PostDetail"
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -27,7 +28,8 @@ export default function App() {
         <Route path="/feed" element={session ? <Feed session={session} /> : <Navigate to="/" />} />
         <Route path="/profile" element={session ? <Profile session={session} /> : <Navigate to="/" />} />
         <Route path="/artist/:username" element={session ? <ArtistProfile session={session} /> : <Navigate to="/" />} />
-        <Route path="/dashboard" element={session ? <Dashboard session={session} /> : <Navigate to="/" />} />
+        <Route path="/Commissions" element={session ? <Commissions session={session} /> : <Navigate to="/" />} />
+        <Route path="/post/:id" element={session ? <PostDetail session={session} /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   )

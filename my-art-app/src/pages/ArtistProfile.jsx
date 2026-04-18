@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { supabase } from "../supabaseClient"
+import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 
 export default function ArtistProfile({ session }) {
@@ -14,6 +15,7 @@ export default function ArtistProfile({ session }) {
   const [deadline, setDeadline] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchArtist()
@@ -147,7 +149,8 @@ export default function ArtistProfile({ session }) {
             <p className="text-gray-400 col-span-3">No artwork posted yet.</p>
           ) : (
             posts.map(post => (
-              <div key={post.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div key={post.id} className="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition" 
+              onClick={() => navigate(`/post/${post.id}`)}>
                 <img
                   src={post.image_url}
                   alt={post.title}

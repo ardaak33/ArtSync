@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../supabaseClient"
 
+
 export default function Navbar() {
   const navigate = useNavigate()
 
@@ -26,10 +27,23 @@ export default function Navbar() {
           Commissions
         </button>
         <button
-          onClick={() => navigate("/profile")}
+          onClick={async () => {
+            const { data } = await supabase
+              .from("profiles")
+              .select("username")
+              .eq("id", (await supabase.auth.getUser()).data.user.id)
+              .single()
+            if (data) navigate(`/artist/${data.username}`)
+          }}
           className="text-sm text-gray-500 hover:text-purple-600 transition"
         >
           My Profile
+        </button>
+        <button
+          onClick={() => navigate("/profile")}
+          className="text-sm text-gray-500 hover:text-purple-600 transition"
+        >
+          Set Profile
         </button>
         <button
           onClick={() => supabase.auth.signOut()}

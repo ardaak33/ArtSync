@@ -76,7 +76,7 @@ export default function ArtistProfile({ session }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar session={session} />
       <div className="max-w-4xl mx-auto mt-8 px-4">
         {/* Artist header */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 flex items-start justify-between">

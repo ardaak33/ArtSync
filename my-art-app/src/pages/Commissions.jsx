@@ -40,7 +40,7 @@ export default function Commissions({ session }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar session={session} />
       <div className="max-w-3xl mx-auto mt-8 px-4 pb-12">
         {loading ? (
           <p className="text-gray-400 text-center">Loading...</p>

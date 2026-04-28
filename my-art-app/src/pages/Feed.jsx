@@ -8,11 +8,6 @@ import Navbar from "../components/Navbar"
 export default function Feed({ session }) {
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [uploading, setUploading] = useState(false)
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [file, setFile] = useState(null)
-  const [showForm, setShowForm] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -29,85 +24,9 @@ export default function Feed({ session }) {
     setLoading(false)
   }
 
-  async function uploadPost() {
-    if (!file || !title) return
-    setUploading(true)
-
-    const fileExt = file.name.split(".").pop()
-    const fileName = `${session.user.id}-${Date.now()}.${fileExt}`
-
-    const { error: uploadError } = await supabase.storage
-      .from("artwork")
-      .upload(fileName, file)
-
-    if (uploadError) {
-      alert(uploadError.message)
-      setUploading(false)
-      return
-    }
-
-    const { data: urlData } = supabase.storage
-      .from("artwork")
-      .getPublicUrl(fileName)
-
-    const { error: postError } = await supabase
-      .from("posts")
-      .insert({
-        user_id: session.user.id,
-        title,
-        description,
-        image_url: urlData.publicUrl,
-      })
-
-    if (postError) alert(postError.message)
-    else {
-      setTitle("")
-      setDescription("")
-      setFile(null)
-      setShowForm(false)
-      fetchPosts()
-    }
-
-    setUploading(false)
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
-      {showForm && (
-        <div className="max-w-lg mx-auto mt-8 bg-white p-6 rounded-2xl shadow-md">
-          <h2 className="text-lg font-bold mb-4">Upload artwork</h2>
-          <div className="flex flex-col gap-4">
-            <input
-              className="border rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400"
-              placeholder="Title"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-            />
-            <textarea
-              className="border rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400 resize-none"
-              placeholder="Description (optional)"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              rows={3}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={e => setFile(e.target.files[0])}
-              className="text-sm text-gray-500"
-            />
-            <button
-              onClick={uploadPost}
-              disabled={uploading || !file || !title}
-              className="bg-purple-600 text-white rounded-lg p-3 font-medium hover:bg-purple-700 transition disabled:opacity-50"
-            >
-              {uploading ? "Uploading..." : "Post artwork"}
-            </button>
-          </div>
-        </div>
-      )}
+      <Navbar session={session} />
 
       <div className="max-w-4xl mx-auto mt-8 px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pb-12">
         {loading ? (

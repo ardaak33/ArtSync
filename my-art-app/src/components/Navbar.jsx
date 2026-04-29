@@ -10,6 +10,7 @@ export default function Navbar({ session }) {
   const [description, setDescription] = useState("")
   const [file, setFile] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [openToFeedback, setOpenToFeedback] = useState(false)
 
   async function uploadPost() {
     if (!file || !title) return
@@ -39,6 +40,7 @@ export default function Navbar({ session }) {
         title,
         description,
         image_url: urlData.publicUrl,
+        open_to_feedback: openToFeedback,
       })
 
     if (postError) alert(postError.message)
@@ -46,6 +48,7 @@ export default function Navbar({ session }) {
       setTitle("")
       setDescription("")
       setFile(null)
+      setOpenToFeedback(false)
       setShowModal(false)
       // Optionally navigate to feed to refresh
       navigate("/feed")
@@ -134,6 +137,18 @@ export default function Navbar({ session }) {
               onChange={e => setFile(e.target.files[0])}
               className="text-sm text-gray-500"
             />
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="openToFeedback"
+                checked={openToFeedback}
+                onChange={e => setOpenToFeedback(e.target.checked)}
+                className="w-4 h-4 text-purple-600 rounded cursor-pointer"
+              />
+              <label htmlFor="openToFeedback" className="text-sm text-gray-700 cursor-pointer">
+                Open to feedback
+              </label>
+            </div>
             <div className="flex gap-2">
               <button
                 onClick={uploadPost}

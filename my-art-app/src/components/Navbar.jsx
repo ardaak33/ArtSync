@@ -11,6 +11,52 @@ export default function Navbar({ session }) {
   const [file, setFile] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [openToFeedback, setOpenToFeedback] = useState(false)
+  const [searchText, setSearchText] = useState("")
+  const [searchResults, setSearchResults] = useState({ users: [], posts: [] })
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false)
+
+  async function fetchSearchResults(query) {
+    const trimmed = query.trim()
+    if (!trimmed) {
+      setSearchResults({ users: [], posts: [] })
+      setShowSearchDropdown(false)
+      return
+    }
+
+    const [usersResult, postsResult] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("id, username")
+        .ilike("username", `%${trimmed}%`)
+        .limit(4),
+      supabase
+        .from("posts")
+        .select("id, title, description, image_url, user_id, user:profiles(username)")
+        .or(`title.ilike.%${trimmed}%,description.ilike.%${trimmed}%`)
+        .limit(4),
+    ])
+
+    const users = usersResult.error ? [] : usersResult.data || []
+    const posts = postsResult.error ? [] : postsResult.data || []
+
+    setSearchResults({ users, posts })
+    setShowSearchDropdown(true)
+  }
+
+  function handleSearchSubmit(event) {
+    event.preventDefault()
+    const query = searchText.trim()
+    if (!query) return
+    setShowSearchDropdown(false)
+    navigate(`/search?q=${encodeURIComponent(query)}`)
+  }
+
+  function handleSelectUser(user) {
+    setSearchText("")
+    setSearchResults([])
+    setShowSearchDropdown(false)
+    navigate(`/artist/${user.username}`)
+  }
 
   async function uploadPost() {
     if (!file || !title) return
@@ -59,14 +105,76 @@ export default function Navbar({ session }) {
 
   return (
     <>
-    <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-      <h1
-        className="text-xl font-bold text-purple-600 cursor-pointer"
-        onClick={() => navigate("/feed")}
-      >
-        ArtSync
-      </h1>
-      <div className="flex gap-4 items-center">
+    <nav className="bg-white shadow-sm px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-1 flex-col md:flex-row md:items-center gap-4">
+        <h1
+          className="text-xl font-bold text-purple-600 cursor-pointer"
+          onClick={() => navigate("/feed")}
+        >
+          ArtSync
+        </h1>
+        <div className="relative w-full max-w-sm">
+          <form onSubmit={handleSearchSubmit}>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+                </svg>
+              </div>
+              <input
+                value={searchText}
+                onChange={e => {
+                  setSearchText(e.target.value)
+                  fetchSearchResults(e.target.value)
+                }}
+                onFocus={() => {
+                  if (searchResults.users.length || searchResults.posts.length) setShowSearchDropdown(true)
+                }}
+                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 150)}
+                className="w-full border rounded-full pl-10 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-400"
+                placeholder="Search users or artwork..."
+              />
+            </div>
+          </form>
+          {showSearchDropdown && (searchResults.users.length > 0 || searchResults.posts.length > 0) && (
+            <div className="absolute z-50 mt-2 w-full rounded-2xl border bg-white shadow-lg">
+              {searchResults.users.length > 0 && (
+                <div className="border-b border-gray-100 px-4 py-3">
+                  <div className="text-xs uppercase tracking-wider text-gray-500">Users</div>
+                  {searchResults.users.map(user => (
+                    <button
+                      key={user.id}
+                      type="button"
+                      onMouseDown={() => handleSelectUser(user)}
+                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-purple-50"
+                    >
+                      @{user.username}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {searchResults.posts.length > 0 && (
+                <div className="px-4 py-3">
+                  <div className="text-xs uppercase tracking-wider text-gray-500">Art posts</div>
+                  {searchResults.posts.map(post => (
+                    <button
+                      key={post.id}
+                      type="button"
+                      onMouseDown={() => navigate(`/post/${post.id}`)}
+                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-purple-50"
+                    >
+                      <div className="font-medium">{post.title || "Untitled"}</div>
+                      <p className="text-xs text-gray-500 truncate">{post.description || "No description"}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="px-4 py-2 text-xs text-gray-500">Search matches users by username and art posts by title or description.</div>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex gap-4 items-center flex-wrap">
         <button
           onClick={() => navigate("/feed")}
           className="text-sm text-gray-500 hover:text-purple-600 transition"

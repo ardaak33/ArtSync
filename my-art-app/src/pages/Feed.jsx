@@ -110,7 +110,7 @@ export default function Feed({ session }) {
                     className="flex items-center gap-1 text-sm hover:scale-110 transition"
                   >
                     <span className={userLikes.has(post.id) ? "text-red-500 text-lg" : "text-gray-400 text-lg"}>
-                      {userLikes.has(post.id) ? "❤️" : "🤍"}
+                      {userLikes.has(post.id) ? "💜" : "🤍"}
                     </span>
                     <span className="text-gray-600 text-sm">{post.likes_count}</span>
                   </button>

@@ -80,25 +80,39 @@ export default function PostDetail({ session }) {
   }
 
   async function toggleLike() {
-    if (isLiked) {
-      await supabase
-        .from("likes")
-        .delete()
-        .eq("post_id", id)
-        .eq("user_id", session.user.id)
-      setIsLiked(false)
-    } else {
-      await supabase
-        .from("likes")
-        .insert({
-          post_id: id,
-          user_id: session.user.id,
-        })
-      setIsLiked(true)
-    }
+    const currentlyLiked = isLiked;
+    setIsLiked(!currentlyLiked);
+    setLikesCount((prev) => (currentlyLiked ? prev - 1 : prev + 1));
 
-    await fetchLikesCount()
-  }
+    if (currentlyLiked) {
+      const { error } = await supabase
+        .from("likes")
+        .delete()
+        .eq("post_id", id)
+        .eq("user_id", session.user.id);
+
+      if (error) {
+        console.error("Error removing like:", error);
+        setIsLiked(true);
+        setLikesCount((prev) => prev + 1);
+      }
+    } else {
+      const { error } = await supabase
+        .from("likes")
+        .insert({
+          post_id: id,
+          user_id: session.user.id,
+        });
+
+      if (error) {
+        console.error("Error adding like:", error);
+        setIsLiked(false);
+        setLikesCount((prev) => prev - 1);
+      }
+    }
+
+    await fetchLikesCount();
+  }
 
   async function submitComment() {
     if (!content) return
@@ -174,7 +188,7 @@ export default function PostDetail({ session }) {
                 className="flex items-center gap-2 hover:scale-110 transition"
               >
                 <span className={isLiked ? "text-red-500 text-2xl" : "text-gray-400 text-2xl"}>
-                  {isLiked ? "❤️" : "🤍"}
+                  {isLiked ? "💜" : "🤍"}
                 </span>
                 <span className="text-gray-600 font-medium">{likesCount}</span>
               </button>

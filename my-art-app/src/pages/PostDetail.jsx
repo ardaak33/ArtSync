@@ -16,6 +16,10 @@ export default function PostDetail({ session }) {
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editTitle, setEditTitle] = useState("")
+  const [editDescription, setEditDescription] = useState("")
+  const [editOpenToFeedback, setEditOpenToFeedback] = useState(false)
 
   useEffect(() => {
     fetchPost()
@@ -156,6 +160,48 @@ export default function PostDetail({ session }) {
     setFeedbackSubmitting(false)
   }
 
+  async function editPost() {
+    if (!post) return
+
+    const { error } = await supabase
+      .from("posts")
+      .update({
+        title: editTitle,
+        description: editDescription,
+        open_to_feedback: editOpenToFeedback,
+      })
+      .eq("id", post.id)
+
+    if (!error) {
+      setShowEditModal(false)
+      fetchPost()
+    } else {
+      alert("Failed to update post")
+    }
+  }
+
+  async function deletePost() {
+    if (!confirm("Are you sure you want to delete this post?")) return
+
+    const { error } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", post.id)
+
+    if (!error) {
+      navigate("/feed")
+    } else {
+      alert("Failed to delete post")
+    }
+  }
+
+  function openEditModal() {
+    setEditTitle(post.title)
+    setEditDescription(post.description || "")
+    setEditOpenToFeedback(post.open_to_feedback)
+    setShowEditModal(true)
+  }
+
   if (loading) return <p className="text-center mt-10">Loading...</p>
   if (!post) return <p className="text-center mt-10">Post not found.</p>
 
@@ -192,6 +238,22 @@ export default function PostDetail({ session }) {
                 </span>
                 <span className="text-gray-600 font-medium">{likesCount}</span>
               </button>
+              {post.user_id === session.user.id && (
+                <div className="ml-auto flex gap-2">
+                  <button
+                    onClick={openEditModal}
+                    className="text-sm text-blue-500 hover:text-blue-700"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={deletePost}
+                    className="text-sm text-red-500 hover:text-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -286,6 +348,56 @@ export default function PostDetail({ session }) {
           </div>
         )}
       </div>
+
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl shadow-md max-w-lg w-full mx-4">
+            <h2 className="text-lg font-bold mb-4">Edit post</h2>
+            <div className="flex flex-col gap-4">
+              <input
+                className="border rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400"
+                placeholder="Title"
+                value={editTitle}
+                onChange={e => setEditTitle(e.target.value)}
+              />
+              <textarea
+                className="border rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+                placeholder="Description (optional)"
+                value={editDescription}
+                onChange={e => setEditDescription(e.target.value)}
+                rows={3}
+              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="editOpenToFeedback"
+                  checked={editOpenToFeedback}
+                  onChange={e => setEditOpenToFeedback(e.target.checked)}
+                  className="w-4 h-4 text-purple-600 rounded cursor-pointer"
+                />
+                <label htmlFor="editOpenToFeedback" className="text-sm text-gray-700 cursor-pointer">
+                  Open to feedback
+                </label>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={editPost}
+                  disabled={!editTitle}
+                  className="bg-purple-600 text-white rounded-lg p-3 font-medium hover:bg-purple-700 transition disabled:opacity-50 flex-1"
+                >
+                  Update post
+                </button>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="bg-gray-300 text-gray-700 rounded-lg p-3 font-medium hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
